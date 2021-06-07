@@ -32,7 +32,7 @@ public class Main {
         //
 
         List<String> albumsForArtist =
-                dataSource.queryAlbumsForArtist("Iron Maiden" , DataSource.ORDER_BY_ASC);
+                dataSource.queryAlbumsForArtist("Carole King" , DataSource.ORDER_BY_ASC);
 
         for (String album : albumsForArtist) {
             System.out.println(album);

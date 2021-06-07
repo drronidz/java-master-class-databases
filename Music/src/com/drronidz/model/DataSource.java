@@ -15,12 +15,12 @@ public class DataSource {
             "jdbc:sqlite:C:\\Work\\Java\\Java Vanilla\\java-master-class-databases\\Music\\" + DB_NAME;
 
     public static final String TABLE_ALBUMS = "albums";
-    public static final String COLUMN_ALBUM_ID = "_id";
-    public static final String COLUMN_ALBUM_NAME = "name";
-    public static final String COLUMN_ALBUM_ARTIST = "artist";
-    public static final int INDEX_ALBUM_ID = 1;
-    public static final int INDEX_ALBUM_NAME = 2;
-    public static final int INDEX_ALBUM_ARTIST = 3;
+    public static final String COLUMN_ALBUMS_ID = "_id";
+    public static final String COLUMN_ALBUMS_NAME = "name";
+    public static final String COLUMN_ALBUMS_ARTIST = "artist";
+    public static final int INDEX_ALBUMS_ID = 1;
+    public static final int INDEX_ALBUMS_NAME = 2;
+    public static final int INDEX_ALBUMS_ARTIST = 3;
 
     public static final String TABLE_ARTISTS = "artists";
     public static final String COLUMN_ARTISTS_ID = "_id";
@@ -43,13 +43,26 @@ public class DataSource {
     public static final int ORDER_BY_DESC = 3;
 
     public static final String QUERY_ALBUMS_BY_ARTIST_START =
-            " SELECT " + TABLE_ALBUMS + "." + COLUMN_ALBUM_NAME + " FROM " + TABLE_ALBUMS +
-                    " INNER JOIN " + TABLE_ARTISTS + " ON " + TABLE_ALBUMS + "." + COLUMN_ALBUM_ARTIST +
+            " SELECT " + TABLE_ALBUMS + "." + COLUMN_ALBUMS_NAME + " FROM " + TABLE_ALBUMS +
+                    " INNER JOIN " + TABLE_ARTISTS + " ON " + TABLE_ALBUMS + "." + COLUMN_ALBUMS_ARTIST +
                     " = " + TABLE_ARTISTS + "." + COLUMN_ARTISTS_ID +
-                    " WHERE " + TABLE_ARTISTS + "." + COLUMN_ALBUM_NAME + " = \"";
+                    " WHERE " + TABLE_ARTISTS + "." + COLUMN_ALBUMS_NAME + " = \"";
 
     public static final String QUERY_ALBUMS_BY_ARTIST_SORT =
-            "ORDER BY " + TABLE_ALBUMS + "." + COLUMN_ALBUM_NAME + " COLLATE NOCASE ";
+            "ORDER BY " + TABLE_ALBUMS + "." + COLUMN_ALBUMS_NAME + " COLLATE NOCASE ";
+
+    public static final String QUERY_ARTIST_FOR_SONG_START =
+            "SELECT " + TABLE_ARTISTS + "." + COLUMN_ARTISTS_NAME + ", " +
+                    TABLE_ALBUMS + "." + COLUMN_ALBUMS_NAME + ", " +
+                    TABLE_SONGS  + "." + COLUMN_SONGS_TRACK + " FROM " + TABLE_SONGS +
+                    " INNER JOIN " + TABLE_ALBUMS + " ON " +
+                    TABLE_SONGS + "." + COLUMN_SONGS_ALBUM + " = " + TABLE_ALBUMS + "." +
+                    COLUMN_ALBUMS_ID + TABLE_ALBUMS + "." + COLUMN_ALBUMS_ARTIST + " = " + TABLE_ARTISTS +
+                    "." + COLUMN_ALBUMS_ID + " WHERE " + TABLE_SONGS + "." + COLUMN_SONGS_TITLE + " =\"";
+
+    public static final String QUERY_ARTSIT_FOR_SONG_SORT =
+            " ORDER BY " + TABLE_ARTISTS + "." + COLUMN_ARTISTS_NAME + ", " +
+                    TABLE_ALBUMS + "." + COLUMN_ALBUMS_NAME + " COLLATE NOCASE";
 
     private Connection connection;
 
