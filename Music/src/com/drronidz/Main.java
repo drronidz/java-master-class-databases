@@ -5,7 +5,10 @@ package com.drronidz;/*
     CREATED ON : 1:59 PM
 */
 
+import com.drronidz.model.Artist;
 import com.drronidz.model.DataSource;
+
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -14,6 +17,16 @@ public class Main {
             System.out.println("Can't open DataSource");
             return;
         }
+        List<Artist> artists = dataSource.queryArtists();
+        if(artists == null) {
+            System.out.println("No artists!");
+            return;
+        }
+
+        for (Artist artist : artists) {
+            System.out.println("ID = " + artist.getId() + ", Name = " + artist.getName());
+        }
+
         dataSource.close();
     }
 }
