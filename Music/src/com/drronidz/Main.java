@@ -7,6 +7,7 @@ package com.drronidz;/*
 
 import com.drronidz.model.Artist;
 import com.drronidz.model.DataSource;
+import com.drronidz.model.SongArtist;
 
 import java.util.List;
 
@@ -37,6 +38,23 @@ public class Main {
         for (String album : albumsForArtist) {
             System.out.println(album);
         }
+
+        System.out.println("------------------------------------------------------");
+
+        List<SongArtist> songArtists = dataSource.queryArtistsForSong("Heartless", DataSource.ORDER_BY_ASC);
+        if(songArtists == null) {
+            System.out.println("Couldn't find the artist for the song");
+            return;
+        }
+
+        for(SongArtist artist : songArtists) {
+            System.out.println("Artist name = " + artist.getArtistName() +
+                    " Album name = " + artist.getAlbumName() +
+                    " Track = " + artist.getTrack());
+        }
+        System.out.println("------------------------------------------------------");
+
+        dataSource.querySongsMetaData();
 
         dataSource.close();
     }
