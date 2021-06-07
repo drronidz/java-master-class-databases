@@ -18,16 +18,29 @@ public class DataSource {
     public static final String COLUMN_ALBUM_ID = "_id";
     public static final String COLUMN_ALBUM_NAME = "name";
     public static final String COLUMN_ALBUM_ARTIST = "artist";
+    public static final int INDEX_ALBUM_ID = 1;
+    public static final int INDEX_ALBUM_NAME = 2;
+    public static final int INDEX_ALBUM_ARTIST = 3;
 
     public static final String TABLE_ARTISTS = "artists";
     public static final String COLUMN_ARTISTS_ID = "_id";
     public static final String COLUMN_ARTISTS_NAME = "name";
+    public static final int INDEX_ARTISTS_ID = 1;
+    public static final int INDEX_ARTISTS_NAME = 2;
 
     public static final String TABLE_SONGS = "songs";
     public static final String COLUMN_SONGS_ID = "_id";
     public static final String COLUMN_SONGS_TRACK = "track";
     public static final String COLUMN_SONGS_TITLE = "title";
     public static final String COLUMN_SONGS_ALBUM = "album";
+    public static final int INDEX_SONGS_ID = 1;
+    public static final int INDEX_SONGS_TRACK = 2;
+    public static final int INDEX_SONGS_TITLE = 3;
+    public static final int INDEX_SONGS_ALBUM = 4;
+
+    public static final int ORDER_BY_NONE = 1;
+    public static final int ORDER_BY_ASC = 2;
+    public static final int ORDER_BY_DESC = 3;
 
     private Connection connection;
 
@@ -54,16 +67,29 @@ public class DataSource {
         }
     }
 
-    public List<Artist> queryArtists() {
+    public List<Artist> queryArtists(int sortOrder) {
+
+        StringBuilder stringBuilder = new StringBuilder("SELECT * FROM ");
+        stringBuilder.append(TABLE_ARTISTS);
+        if(sortOrder != ORDER_BY_NONE) {
+            stringBuilder.append(" ORDER BY ");
+            stringBuilder.append(COLUMN_ARTISTS_NAME);
+            stringBuilder.append(" COLLATE NOCASE ");
+            if(sortOrder == ORDER_BY_DESC) {
+                stringBuilder.append("DESC");
+            } else {
+                stringBuilder.append("ASC");
+            }
+        }
 
         try (Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("SELECT * FROM " + TABLE_ARTISTS)) {
+             ResultSet resultSet = statement.executeQuery(stringBuilder.toString())) {
 
             List<Artist> artists = new ArrayList<>();
             while (resultSet.next()) {
                 Artist artist = new Artist();
-                artist.setId(resultSet.getInt(COLUMN_ARTISTS_ID));
-                artist.setName(resultSet.getString(COLUMN_ARTISTS_NAME));
+                artist.setId(resultSet.getInt(INDEX_ARTISTS_ID));
+                artist.setName(resultSet.getString(INDEX_ARTISTS_NAME));
                 artists.add(artist);
             }
 
