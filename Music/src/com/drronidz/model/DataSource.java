@@ -54,7 +54,7 @@ public class DataSource {
     public static final String QUERY_ARTIST_FOR_SONG_START =
             "SELECT " + TABLE_ARTISTS + "." + COLUMN_ARTISTS_NAME + ", " +
                     TABLE_ALBUMS + "." + COLUMN_ALBUMS_NAME + ", " +
-                    TABLE_SONGS  + "." + COLUMN_SONGS_TRACK + " FROM " + TABLE_SONGS +
+                    TABLE_SONGS + "." + COLUMN_SONGS_TRACK + " FROM " + TABLE_SONGS +
                     " INNER JOIN " + TABLE_ALBUMS + " ON " +
                     TABLE_SONGS + "." + COLUMN_SONGS_ALBUM + " = " + TABLE_ALBUMS + "." + COLUMN_ALBUMS_ID +
                     " INNER JOIN " + TABLE_ARTISTS + " ON " +
@@ -67,39 +67,46 @@ public class DataSource {
 
     public static final String TABLE_ARTIST_SONG_VIEW = "artist_list";
 
-//    CREATE VIEW IF NOT EXISTS artist_list AS SELECT artists.name, albums.name AS album,
+    //    CREATE VIEW IF NOT EXISTS artist_list AS SELECT artists.name, albums.name AS album,
 //    songs.track, songs.title FROM songs INNER JOIN albums ON songs.album = albums._id
 //    INNER JOIN artistsON albums.artist = artists._id ORDER BY artists.name
 //    albums.name, songs.track
-public static final String CREATE_ARTIST_FOR_SONG_VIEW = "CREATE VIEW IF NOT EXISTS " +
-        TABLE_ARTIST_SONG_VIEW + " AS SELECT " + TABLE_ARTISTS + "." + COLUMN_ARTISTS_NAME + ", " +
-        TABLE_ALBUMS + "." + COLUMN_ALBUMS_NAME + " AS " + COLUMN_SONGS_ALBUM + ", " +
-        TABLE_SONGS + "." + COLUMN_SONGS_TRACK + ", " + TABLE_SONGS + "." + COLUMN_SONGS_TITLE +
-        " FROM " + TABLE_SONGS +
-        " INNER JOIN " + TABLE_ALBUMS + " ON " + TABLE_SONGS +
-        "." + COLUMN_SONGS_ALBUM + " = " + TABLE_ALBUMS + "." + COLUMN_ALBUMS_ID +
-        " INNER JOIN " + TABLE_ARTISTS + " ON " + TABLE_ALBUMS + "." + COLUMN_ALBUMS_ARTIST +
-        " = " + TABLE_ARTISTS + "." + COLUMN_ARTISTS_ID +
-        " ORDER BY " +
-        TABLE_ARTISTS + "." + COLUMN_ARTISTS_NAME + ", " +
-        TABLE_ALBUMS + "." + COLUMN_ALBUMS_NAME + ", " +
-        TABLE_SONGS + "." + COLUMN_SONGS_TRACK;
+    public static final String CREATE_ARTIST_FOR_SONG_VIEW = "CREATE VIEW IF NOT EXISTS " +
+            TABLE_ARTIST_SONG_VIEW + " AS SELECT " + TABLE_ARTISTS + "." + COLUMN_ARTISTS_NAME + ", " +
+            TABLE_ALBUMS + "." + COLUMN_ALBUMS_NAME + " AS " + COLUMN_SONGS_ALBUM + ", " +
+            TABLE_SONGS + "." + COLUMN_SONGS_TRACK + ", " + TABLE_SONGS + "." + COLUMN_SONGS_TITLE +
+            " FROM " + TABLE_SONGS +
+            " INNER JOIN " + TABLE_ALBUMS + " ON " + TABLE_SONGS +
+            "." + COLUMN_SONGS_ALBUM + " = " + TABLE_ALBUMS + "." + COLUMN_ALBUMS_ID +
+            " INNER JOIN " + TABLE_ARTISTS + " ON " + TABLE_ALBUMS + "." + COLUMN_ALBUMS_ARTIST +
+            " = " + TABLE_ARTISTS + "." + COLUMN_ARTISTS_ID +
+            " ORDER BY " +
+            TABLE_ARTISTS + "." + COLUMN_ARTISTS_NAME + ", " +
+            TABLE_ALBUMS + "." + COLUMN_ALBUMS_NAME + ", " +
+            TABLE_SONGS + "." + COLUMN_SONGS_TRACK;
 
     public static final String QUERY_VIEW_SONG_INFO = "SELECT " + COLUMN_ARTISTS_NAME + ", " +
             COLUMN_SONGS_ALBUM + ", " + COLUMN_SONGS_TRACK + " FROM " + TABLE_ARTIST_SONG_VIEW +
             " WHERE " + COLUMN_SONGS_TITLE + " = \"";
 
+    public static final String QUERY_VIEW_SONG_INFO_PREP = "SELECT " + COLUMN_ARTISTS_NAME + ", " +
+            COLUMN_SONGS_ALBUM + ", " + COLUMN_SONGS_TRACK + " FROM " + TABLE_ARTIST_SONG_VIEW +
+            " WHERE " + COLUMN_SONGS_TITLE + " = ?";
 
+    // SELECT name, album, track FROM artist_list WHERE title = ?
 
     private Connection connection;
+
+    private PreparedStatement preparedStatement;
 
     public boolean open() {
         try {
             connection = DriverManager.getConnection(CONNECTION_STRING);
+            preparedStatement = connection.prepareStatement(QUERY_VIEW_SONG_INFO_PREP);
             return true;
 
         } catch (SQLException e) {
-            System.out.println("Couldn't connect to database: " +e.getMessage());
+            System.out.println("Couldn't connect to database: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -107,11 +114,11 @@ public static final String CREATE_ARTIST_FOR_SONG_VIEW = "CREATE VIEW IF NOT EXI
 
     public void close() {
         try {
-            if(connection != null) {
-                connection.close();
+            if (preparedStatement != null) {
+                preparedStatement.close();
             }
         } catch (SQLException e) {
-            System.out.println("Couldn't connect to database: " +e.getMessage());
+            System.out.println("Couldn't connect to database: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -120,11 +127,11 @@ public static final String CREATE_ARTIST_FOR_SONG_VIEW = "CREATE VIEW IF NOT EXI
 
         StringBuilder stringBuilder = new StringBuilder("SELECT * FROM ");
         stringBuilder.append(TABLE_ARTISTS);
-        if(sortOrder != ORDER_BY_NONE) {
+        if (sortOrder != ORDER_BY_NONE) {
             stringBuilder.append(" ORDER BY ");
             stringBuilder.append(COLUMN_ARTISTS_NAME);
             stringBuilder.append(" COLLATE NOCASE ");
-            if(sortOrder == ORDER_BY_DESC) {
+            if (sortOrder == ORDER_BY_DESC) {
                 stringBuilder.append("DESC");
             } else {
                 stringBuilder.append("ASC");
@@ -176,9 +183,9 @@ public static final String CREATE_ARTIST_FOR_SONG_VIEW = "CREATE VIEW IF NOT EXI
         stringBuilder.append(artistName);
         stringBuilder.append("\"");
 
-        if(sortOrder != ORDER_BY_NONE) {
+        if (sortOrder != ORDER_BY_NONE) {
             stringBuilder.append(QUERY_ALBUMS_BY_ARTIST_SORT);
-            if(sortOrder == ORDER_BY_DESC) {
+            if (sortOrder == ORDER_BY_DESC) {
                 stringBuilder.append("DESC");
             } else {
                 stringBuilder.append("ASC");
@@ -206,9 +213,9 @@ public static final String CREATE_ARTIST_FOR_SONG_VIEW = "CREATE VIEW IF NOT EXI
         StringBuilder stringBuilder = new StringBuilder(QUERY_ARTIST_FOR_SONG_START);
         stringBuilder.append(songName);
         stringBuilder.append("\"");
-        if(sortOrder != ORDER_BY_NONE) {
+        if (sortOrder != ORDER_BY_NONE) {
             stringBuilder.append(QUERY_ARTSIT_FOR_SONG_SORT);
-            if(sortOrder == ORDER_BY_DESC) {
+            if (sortOrder == ORDER_BY_DESC) {
                 stringBuilder.append("DESC");
             } else {
                 stringBuilder.append("ASC");
@@ -220,7 +227,7 @@ public static final String CREATE_ARTIST_FOR_SONG_VIEW = "CREATE VIEW IF NOT EXI
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(stringBuilder.toString())) {
 
-            List<SongArtist> songArtists= new ArrayList<>();
+            List<SongArtist> songArtists = new ArrayList<>();
 
             while (resultSet.next()) {
                 SongArtist songArtist = new SongArtist();
@@ -249,7 +256,7 @@ public static final String CREATE_ARTIST_FOR_SONG_VIEW = "CREATE VIEW IF NOT EXI
             ResultSetMetaData metaData = resultSet.getMetaData();
             int numColumns = metaData.getColumnCount();
 
-            for(int i=1; i<= numColumns; i++) {
+            for (int i = 1; i <= numColumns; i++) {
                 System.out.format("Column %d in the songs table is names %s\n",
                         i, metaData.getColumnName(i));
             }
@@ -291,19 +298,12 @@ public static final String CREATE_ARTIST_FOR_SONG_VIEW = "CREATE VIEW IF NOT EXI
     // SELECT name, album, track FROM artist_list WHERE title ="Go Your Own Way"
 
     public List<SongArtist> querySongInfoView(String title) {
-        StringBuilder stringBuilder = new StringBuilder(QUERY_VIEW_SONG_INFO);
-        stringBuilder.append(title);
-        stringBuilder.append("\"");
 
-        System.out.println(stringBuilder.toString());
-
-
-
-        try (Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(stringBuilder.toString())) {
+        try {
+            preparedStatement.setString(1, title);
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             List<SongArtist> songArtists = new ArrayList<>();
-
             while (resultSet.next()) {
                 SongArtist songArtist = new SongArtist();
                 songArtist.setArtistName(resultSet.getString(1));
@@ -313,9 +313,8 @@ public static final String CREATE_ARTIST_FOR_SONG_VIEW = "CREATE VIEW IF NOT EXI
             }
 
             return songArtists;
-
         } catch (SQLException e) {
-            System.out.println("QUERY");
+            System.out.println("Query failed: " + e.getMessage());
             e.printStackTrace();
             return null;
         }
