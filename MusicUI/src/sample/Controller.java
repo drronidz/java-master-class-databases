@@ -9,27 +9,26 @@ import javafx.scene.control.TableView;
 import sample.model.Album;
 import sample.model.Artist;
 import sample.model.DataSource;
-
-import java.util.concurrent.ExecutionException;
+import sample.model.DataSource;
 
 public class Controller {
 
     @FXML
-    public TableView artistTable;
+    private TableView artistTable;
 
     @FXML
-    public ProgressBar progressBar;
+    private ProgressBar progressBar;
 
     @FXML
-    public void lisArtists() {
+    public void listArtists() {
         Task<ObservableList<Artist>> task = new GetAllArtistsTask();
         artistTable.itemsProperty().bind(task.valueProperty());
         progressBar.progressProperty().bind(task.progressProperty());
 
         progressBar.setVisible(true);
 
-        task.setOnSucceeded(event -> { progressBar.setVisible(false); });
-        task.setOnFailed(event -> { progressBar.setVisible(false); });
+        task.setOnSucceeded(e -> progressBar.setVisible(false));
+        task.setOnFailed(e -> progressBar.setVisible(false));
 
         new Thread(task).start();
     }
@@ -38,28 +37,28 @@ public class Controller {
     public void listAlbumsForArtist() {
         final Artist artist = (Artist) artistTable.getSelectionModel().getSelectedItem();
         if(artist == null) {
-            System.out.println("No ARTIST SELECTED !");
+            System.out.println("NO ARTIST SELECTED");
             return;
         }
-        Task<ObservableList<Album>> task = new Task<>() {
+        Task<ObservableList<Album>> task = new Task<ObservableList<Album>>() {
             @Override
-            protected ObservableList<Album> call() {
+            protected ObservableList<Album> call() throws Exception {
                 return FXCollections.observableArrayList(
-                        DataSource.getInstance().queryAlbumsForArtistID(artist.getId()));
+                        DataSource.getInstance().queryAlbumsForArtistId(artist.getId()));
             }
         };
         artistTable.itemsProperty().bind(task.valueProperty());
 
         new Thread(task).start();
+
     }
 }
 
 class GetAllArtistsTask extends Task {
 
     @Override
-    public ObservableList<Artist> call() throws Exception {
-        return FXCollections.observableArrayList(
-                DataSource.getInstance().queryArtists(DataSource.ORDER_BY_ASC)
-        );
+    public ObservableList<Artist> call()  {
+        return FXCollections.observableArrayList
+                (DataSource.getInstance().queryArtists(DataSource.ORDER_BY_ASC));
     }
 }
