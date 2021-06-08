@@ -111,7 +111,8 @@ public class DataSource {
     public static final String QUERY_ALBUMS_BY_ARTIST_ID = "SELECT * FROM " + TABLE_ALBUMS +
             " WHERE " + COLUMN_ALBUMS_ARTIST + " = ? ORDER BY " + COLUMN_ALBUMS_NAME + " COLLATE NOCASE";
 
-
+    public static final String UPDATE_ARTIST_NAME = "UPDATE " + TABLE_ARTISTS + " SET " +
+            COLUMN_ARTISTS_NAME + " = ? WHERE " + COLUMN_ARTISTS_ID + " = ?";
 
     private Connection connection;
 
@@ -124,6 +125,8 @@ public class DataSource {
     private PreparedStatement queryArtist;
     private PreparedStatement queryAlbum;
     private PreparedStatement queryAlbumsByArtistID;
+    private PreparedStatement updateArtistName;
+
 
 
 
@@ -151,6 +154,7 @@ public class DataSource {
             queryArtist = connection.prepareStatement(QUERY_ARTIST);
             queryAlbum = connection.prepareStatement(QUERY_ALBUM);
             queryAlbumsByArtistID = connection.prepareStatement(QUERY_ALBUMS_BY_ARTIST_ID);
+            updateArtistName = connection.prepareStatement(UPDATE_ARTIST_NAME);
 
             return true;
 
@@ -183,6 +187,9 @@ public class DataSource {
             }
             if(queryAlbumsByArtistID != null) {
                 queryAlbumsByArtistID.close();
+            }
+            if(updateArtistName != null) {
+                updateArtistName.close();
             }
         } catch (SQLException e) {
             System.out.println("Couldn't connect to database: " + e.getMessage());
@@ -436,6 +443,19 @@ public class DataSource {
                 System.out.println("Couldn't reset auto-commit! " + e.getMessage());
             }
 
+        }
+    }
+
+    public boolean updateArtistName(int id, String newName) {
+        try {
+            updateArtistName.setString(1, newName);
+            updateArtistName.setInt(2, id);
+            int affectedRecords = updateArtistName.executeUpdate();
+
+            return affectedRecords == 1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }
