@@ -93,16 +93,51 @@ public class DataSource {
             COLUMN_SONGS_ALBUM + ", " + COLUMN_SONGS_TRACK + " FROM " + TABLE_ARTIST_SONG_VIEW +
             " WHERE " + COLUMN_SONGS_TITLE + " = ?";
 
+    public static final String INSERT_ARTIST = "INSERT INTO " + TABLE_ARTISTS +
+            '(' + COLUMN_ARTISTS_NAME + ", " + COLUMN_ALBUMS_ARTIST + ") VALUES (" +
+            " ?, ?)";
+
+    public static final String INSERT_ALBUMS = "INSERT INTO" + TABLE_ALBUMS +
+            '(' + COLUMN_SONGS_TRACK + ", " + COLUMN_SONGS_TITLE + ", " + COLUMN_SONGS_ALBUM +
+            ") VALUES(?, ?, ?)";
+
+    public static final String INSERT_SONGS = "INSERT INTO " + TABLE_SONGS +
+            '(' + COLUMN_SONGS_TRACK + ", " + COLUMN_SONGS_TITLE + ", " + COLUMN_SONGS_ALBUM +
+            ") VALUES (?, ?, ?)";
+
+    public static final String QUERY_ARTIST = "SELECT " + COLUMN_ARTISTS_ID + " FROM " +
+            TABLE_ARTISTS + " WHERE " + COLUMN_ARTISTS_NAME + " = ?";
+
+    public static final String QUERY_ALBUM = "SELECT " + COLUMN_ALBUMS_ID + " FROM " +
+            TABLE_ALBUMS + " WHERE " + COLUMN_ALBUMS_NAME + " = ?";
+
+
+
+
+
     // SELECT name, album, track FROM artist_list WHERE title = ?
 
     private Connection connection;
 
     private PreparedStatement preparedStatement;
 
+    private PreparedStatement insertIntoArtists;
+    private PreparedStatement insertIntoAlbums;
+    private PreparedStatement insertIntoSongs;
+
+    private PreparedStatement queryArtist;
+    private PreparedStatement queryAlbum;
+
+
     public boolean open() {
         try {
             connection = DriverManager.getConnection(CONNECTION_STRING);
             preparedStatement = connection.prepareStatement(QUERY_VIEW_SONG_INFO_PREP);
+
+            insertIntoArtists = connection.prepareStatement(INSERT_ARTIST, Statement.RETURN_GENERATED_KEYS);
+            insertIntoAlbums = connection.prepareStatement(INSERT_ALBUMS, Statement.RETURN_GENERATED_KEYS);
+            insertIntoSongs = connection.prepareStatement(INSERT_SONGS, Statement.RETURN_GENERATED_KEYS);
+
             return true;
 
         } catch (SQLException e) {
@@ -114,8 +149,23 @@ public class DataSource {
 
     public void close() {
         try {
-            if (preparedStatement != null) {
+            if(preparedStatement != null) {
                 preparedStatement.close();
+            }
+            if(insertIntoArtists != null) {
+                insertIntoArtists.close();
+            }
+            if(insertIntoAlbums != null) {
+                insertIntoAlbums.close();
+            }
+            if(insertIntoSongs != null) {
+                insertIntoSongs.close();
+            }
+            if(queryArtist != null) {
+                queryArtist.close();
+            }
+            if(queryAlbum != null) {
+                queryAlbum.close();
             }
         } catch (SQLException e) {
             System.out.println("Couldn't connect to database: " + e.getMessage());
