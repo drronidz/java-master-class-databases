@@ -5,23 +5,33 @@ package sample.model;/*
     CREATED ON : 2:50 PM
 */
 
-public class Artist {
-    private int id;
-    private String name;
+import javafx.beans.property.SimpleStringProperty;
 
-    public int getId() {
+public class Artist {
+    private SimpleStringProperty id;
+    private SimpleStringProperty name;
+
+    public String getId() {
+        return id.get();
+    }
+
+    public SimpleStringProperty idProperty() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setId(String id) {
+        this.id.set(id);
     }
 
     public String getName() {
+        return name.get();
+    }
+
+    public SimpleStringProperty nameProperty() {
         return name;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name.set(name);
     }
 }
