@@ -48,6 +48,7 @@
                         text="List Artists" />
                 <Button maxWidth="Infinity"
                         mnemonicParsing="false"
+                        onAction="#listAlbumsForArtist"
                         text="Show Albums (artist)" />
                 <Button
                         maxWidth="Infinity"

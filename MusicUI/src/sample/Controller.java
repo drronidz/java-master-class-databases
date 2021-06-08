@@ -5,8 +5,11 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableView;
+import sample.model.Album;
 import sample.model.Artist;
 import sample.model.DataSource;
+
+import java.util.concurrent.ExecutionException;
 
 public class Controller {
 
@@ -16,6 +19,25 @@ public class Controller {
     public void lisArtists() {
         Task<ObservableList<Artist>> task = new GetAllArtistsTask();
         artistTable.itemsProperty().bind(task.valueProperty());
+        new Thread(task).start();
+    }
+
+    @FXML
+    public void listAlbumsForArtist() {
+        final Artist artist = (Artist) artistTable.getSelectionModel().getSelectedItem();
+        if(artist == null) {
+            System.out.println("No ARTIST SELECTED !");
+            return;
+        }
+        Task<ObservableList<Album>> task = new Task<>() {
+            @Override
+            protected ObservableList<Album> call() {
+                return FXCollections.observableArrayList(
+                        DataSource.getInstance().queryAlbumsForArtistID(artist.getId()));
+            }
+        };
+        artistTable.itemsProperty().bind(task.valueProperty());
+
         new Thread(task).start();
     }
 }
