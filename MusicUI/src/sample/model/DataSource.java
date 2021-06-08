@@ -108,9 +108,10 @@ public class DataSource {
     public static final String QUERY_ALBUM = "SELECT " + COLUMN_ALBUMS_ID + " FROM " +
             TABLE_ALBUMS + " WHERE " + COLUMN_ALBUMS_NAME + " = ?";
 
+    public static final String QUERY_ALBUMS_BY_ARTIST_ID = "SELECT * FROM " + TABLE_ALBUMS +
+            " WHERE " + COLUMN_ALBUMS_ARTIST + " = ? ORDER BY " + COLUMN_ALBUMS_NAME + " COLLATE NOCASE";
 
 
-    // SELECT name, album, track FROM artist_list WHERE title = ?
 
     private Connection connection;
 
@@ -122,6 +123,9 @@ public class DataSource {
 
     private PreparedStatement queryArtist;
     private PreparedStatement queryAlbum;
+    private PreparedStatement queryAlbumsByArtistID;
+
+
 
     private static DataSource instance = new DataSource();
 
@@ -146,6 +150,7 @@ public class DataSource {
 
             queryArtist = connection.prepareStatement(QUERY_ARTIST);
             queryAlbum = connection.prepareStatement(QUERY_ALBUM);
+            queryAlbumsByArtistID = connection.prepareStatement(QUERY_ALBUMS_BY_ARTIST_ID);
 
             return true;
 
@@ -175,6 +180,9 @@ public class DataSource {
             }
             if(queryAlbum != null) {
                 queryAlbum.close();
+            }
+            if(queryAlbumsByArtistID != null) {
+                queryAlbumsByArtistID.close();
             }
         } catch (SQLException e) {
             System.out.println("Couldn't connect to database: " + e.getMessage());
