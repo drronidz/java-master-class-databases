@@ -56,6 +56,15 @@ public class Main {
 
         dataSource.querySongsMetaData();
 
+        System.out.println("------------------------------------------------------");
+
+        int count = dataSource.getCount(DataSource.TABLE_SONGS);
+        System.out.println("Number of songs is: " + count);
+
+        System.out.println("------------------------------------------------------");
+
+        dataSource.createViewForSongArtists();
+
         dataSource.close();
     }
 }
