@@ -85,6 +85,10 @@ public static final String CREATE_ARTIST_FOR_SONG_VIEW = "CREATE VIEW IF NOT EXI
         TABLE_ALBUMS + "." + COLUMN_ALBUMS_NAME + ", " +
         TABLE_SONGS + "." + COLUMN_SONGS_TRACK;
 
+    public static final String QUERY_VIEW_SONG_INFO = "SELECT " + COLUMN_ARTISTS_NAME + ", " +
+            COLUMN_SONGS_ALBUM + ", " + COLUMN_SONGS_TRACK + " FROM " + TABLE_ARTIST_SONG_VIEW +
+            " WHERE " + COLUMN_SONGS_TITLE + " = \"";
+
 
 
     private Connection connection;
@@ -282,6 +286,40 @@ public static final String CREATE_ARTIST_FOR_SONG_VIEW = "CREATE VIEW IF NOT EXI
             e.printStackTrace();
             return false;
         }
+    }
+
+    // SELECT name, album, track FROM artist_list WHERE title ="Go Your Own Way"
+
+    public List<SongArtist> querySongInfoView(String title) {
+        StringBuilder stringBuilder = new StringBuilder(QUERY_VIEW_SONG_INFO);
+        stringBuilder.append(title);
+        stringBuilder.append("\"");
+
+        System.out.println(stringBuilder.toString());
+
+
+
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(stringBuilder.toString())) {
+
+            List<SongArtist> songArtists = new ArrayList<>();
+
+            while (resultSet.next()) {
+                SongArtist songArtist = new SongArtist();
+                songArtist.setArtistName(resultSet.getString(1));
+                songArtist.setAlbumName(resultSet.getString(2));
+                songArtist.setTrack(resultSet.getInt(3));
+                songArtists.add(songArtist);
+            }
+
+            return songArtists;
+
+        } catch (SQLException e) {
+            System.out.println("QUERY");
+            e.printStackTrace();
+            return null;
+        }
+
     }
 }
 
